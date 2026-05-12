@@ -1,0 +1,48 @@
+services:
+  app:
+    image: app-laravel
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    hostname: php.laravel.test
+    expose:
+      - 9000
+    networks:
+      - devnet
+    volumes:
+      - ./:/var/www/html
+  db:
+    image: postgres
+    hostname: db.laravel.test
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - devnet
+
+  nginx:
+    image: nginx:latest
+    container_name: laravel-nginx
+    hostname: laravel.test
+    expose:
+      - 80
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - devnet
+    depends_on:
+      - app
+  redis:
+    image: redis:alpine
+    container_name: laravel-redis
+    hostname: redis.laravel.test
+    networks:
+      - devnet
+
+volumes:
+  db-data: null
+
+networks:
+  devnet:
+    name: devnet
+    external: true
