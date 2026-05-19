@@ -1,0 +1,4 @@
+Page::all()
+App\Models\Page::all()
+App\Models\Page::all()
+exit
