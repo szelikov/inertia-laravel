@@ -8,19 +8,41 @@ services:
     expose:
       - 9000
     networks:
-      - devnet
+      - test-laravel
     volumes:
       - ./:/var/www/html
+    depends_on:
+      - db
+      - redis
+
   db:
-    image: postgres
+    image: postgres:18.3-alpine
+    container_name: laravel-db
     hostname: db.laravel.test
+    expose:
+      - 5432
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql
     networks:
-      - devnet
+      - test-laravel
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_DB: ${DB_DATABASE}
+
+  front_dev:
+    image: laravel-pnpm
+    hostname: vue.laravel.test
+    build:
+      context: .
+      dockerfile: ./docker/node/Dockerfile
+    volumes:
+      - ./:/app
+    networks:
+      - test-laravel
 
   nginx:
-    image: nginx:latest
+    image: nginx:1.30.0-alpine
     container_name: laravel-nginx
     hostname: laravel.test
     expose:
@@ -29,20 +51,19 @@ services:
       - ./:/var/www/html
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     networks:
-      - devnet
+      - test-laravel
     depends_on:
       - app
+
   redis:
     image: redis:alpine
     container_name: laravel-redis
     hostname: redis.laravel.test
     networks:
-      - devnet
+      - test-laravel
 
 volumes:
   db-data: null
 
 networks:
-  devnet:
-    name: devnet
-    external: true
+  test-laravel: null
