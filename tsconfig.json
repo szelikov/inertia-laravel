@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "isolatedModules": true,
+    "useDefineForClassFields": true,
+    "noImplicitAny": true,
+    "types": [
+      "resources/ts/types/*"
+    ]
+  },
+  "include": ["resources/ts/**/*", "vite.config.ts"]
+}
